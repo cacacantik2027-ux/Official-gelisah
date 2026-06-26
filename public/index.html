@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GELISAH - VCS Talent Agency</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI',sans-serif;background:#0a0a0f;color:#fff;min-height:100vh;}
+:root{--gold:#c9a84c;--gold2:#f0d080;--dark:#0a0a0f;--card:#13131a;--card2:#1a1a25;}
+
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:14px 24px;background:rgba(10,10,15,0.85);backdrop-filter:blur(12px);border-bottom:1px solid rgba(201,168,76,0.15);}
+.nav-logo{font-size:20px;font-weight:800;letter-spacing:2px;color:var(--gold);}
+.nav-badge{font-size:10px;background:rgba(201,168,76,0.15);color:var(--gold);border:1px solid rgba(201,168,76,0.3);padding:3px 10px;border-radius:20px;letter-spacing:1px;}
+.nav-right{display:flex;gap:10px;align-items:center;}
+.btn-admin{font-size:11px;background:transparent;color:rgba(255,255,255,0.4);border:1px solid rgba(255,255,255,0.15);padding:5px 12px;border-radius:6px;cursor:pointer;transition:.2s;}
+.btn-admin:hover{color:#fff;border-color:rgba(255,255,255,0.4);}
+
+.page{display:none;min-height:100vh;}
+.page.active{display:block;}
+
+#page-home{padding-top:72px;}
+.hero{text-align:center;padding:70px 24px 50px;}
+.hero-title{font-size:clamp(32px,6vw,64px);font-weight:900;letter-spacing:4px;color:#fff;text-shadow:0 0 40px rgba(201,168,76,0.3);}
+.hero-title span{color:var(--gold);}
+.hero-subtitle{margin-top:16px;font-size:clamp(13px,2vw,16px);color:rgba(255,255,255,0.6);max-width:580px;margin-inline:auto;line-height:1.7;}
+.hero-divider{width:80px;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:28px auto;}
+
+.talent-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:20px;padding:0 24px 120px;max-width:1100px;margin:0 auto;}
+.talent-card{background:var(--card);border:1px solid rgba(201,168,76,0.15);border-radius:16px;overflow:hidden;cursor:pointer;transition:transform .25s,box-shadow .25s,border-color .25s;}
+.talent-card:hover{transform:translateY(-6px);box-shadow:0 16px 40px rgba(201,168,76,0.12);border-color:rgba(201,168,76,0.4);}
+.talent-card img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block;}
+.talent-card-no-img{width:100%;aspect-ratio:3/4;background:linear-gradient(135deg,#1a1a2e,#16213e);display:flex;align-items:center;justify-content:center;font-size:48px;color:rgba(201,168,76,0.3);}
+.talent-info{padding:14px 16px;}
+.talent-name{font-size:16px;font-weight:700;color:#fff;margin-bottom:4px;}
+.talent-desc{font-size:12px;color:rgba(255,255,255,0.5);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.talent-cta{font-size:11px;color:var(--gold);margin-top:8px;display:flex;align-items:center;gap:4px;}
+
+.bottom-left-btns{position:fixed;bottom:24px;left:24px;z-index:200;display:flex;flex-direction:column;gap:8px;}
+.fixed-btn{background:rgba(18,18,28,0.95);border:1px solid rgba(201,168,76,0.4);color:var(--gold);font-size:12px;font-weight:700;padding:10px 16px;border-radius:10px;cursor:pointer;text-decoration:none;display:flex;align-items:center;gap:8px;letter-spacing:0.5px;transition:.2s;backdrop-filter:blur(8px);}
+.fixed-btn:hover{background:rgba(201,168,76,0.15);border-color:var(--gold);}
+.fixed-btn svg{width:16px;height:16px;fill:var(--gold);}
+
+#page-detail{padding-top:72px;}
+.detail-wrap{max-width:700px;margin:0 auto;padding:40px 24px 120px;}
+.back-btn{background:transparent;border:1px solid rgba(255,255,255,0.2);color:#fff;padding:8px 16px;border-radius:8px;cursor:pointer;font-size:13px;margin-bottom:28px;display:flex;align-items:center;gap:6px;transition:.2s;}
+.back-btn:hover{border-color:var(--gold);color:var(--gold);}
+.detail-photo{width:100%;max-height:500px;object-fit:cover;border-radius:16px;border:1px solid rgba(201,168,76,0.2);}
+.detail-photo-placeholder{width:100%;aspect-ratio:3/4;background:linear-gradient(135deg,#1a1a2e,#16213e);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:80px;color:rgba(201,168,76,0.2);}
+.detail-name{font-size:28px;font-weight:900;color:#fff;margin-top:24px;letter-spacing:1px;}
+.detail-badge{display:inline-block;background:rgba(201,168,76,0.15);color:var(--gold);border:1px solid rgba(201,168,76,0.3);font-size:11px;padding:3px 12px;border-radius:20px;letter-spacing:1px;margin-top:8px;}
+.detail-desc{color:rgba(255,255,255,0.7);line-height:1.8;margin-top:16px;font-size:15px;}
+.order-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;margin-top:28px;padding:16px;background:linear-gradient(135deg,#c9a84c,#f0d080);color:#0a0a0f;font-size:16px;font-weight:800;border:none;border-radius:12px;cursor:pointer;letter-spacing:0.5px;transition:.2s;text-decoration:none;}
+.order-btn:hover{opacity:.9;transform:translateY(-1px);}
+
+#page-admin{padding-top:72px;}
+.admin-wrap{max-width:900px;margin:0 auto;padding:30px 24px 120px;}
+.admin-title{font-size:22px;font-weight:800;color:var(--gold);letter-spacing:2px;margin-bottom:4px;}
+.admin-sub{font-size:13px;color:rgba(255,255,255,0.4);margin-bottom:28px;}
+.section-card{background:var(--card);border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:22px;margin-bottom:20px;}
+.section-title{font-size:14px;font-weight:700;color:#fff;letter-spacing:1px;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+.section-title::before{content:'';display:block;width:3px;height:16px;background:var(--gold);border-radius:2px;}
+label{font-size:12px;color:rgba(255,255,255,0.5);display:block;margin-bottom:6px;}
+input[type=text],input[type=url],textarea{width:100%;background:#0d0d15;border:1px solid rgba(255,255,255,0.1);color:#fff;padding:10px 12px;border-radius:8px;font-size:13px;outline:none;transition:.2s;font-family:inherit;}
+input[type=text]:focus,input[type=url]:focus,textarea:focus{border-color:rgba(201,168,76,0.5);}
+textarea{resize:vertical;min-height:80px;}
+.bg-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+@media(max-width:600px){.bg-row,.talent-admin-grid{grid-template-columns:1fr!important;}}
+.color-row{display:flex;gap:10px;align-items:center;}
+input[type=color]{width:44px;height:36px;border:1px solid rgba(255,255,255,0.15);border-radius:6px;cursor:pointer;background:none;padding:2px;}
+.bg-preview{height:60px;border-radius:8px;margin-top:10px;background-size:cover;background-position:center;border:1px solid rgba(255,255,255,0.1);}
+.talent-admin-item{background:var(--card2);border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:16px;margin-bottom:12px;}
+.talent-admin-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+.talent-num{font-size:12px;color:var(--gold);font-weight:700;}
+.talent-admin-actions{display:flex;gap:6px;}
+.btn-sm{background:transparent;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.6);padding:4px 10px;border-radius:6px;cursor:pointer;font-size:11px;transition:.2s;}
+.btn-sm:hover{border-color:var(--gold);color:var(--gold);}
+.btn-sm.del:hover{border-color:#e24b4a;color:#e24b4a;}
+.talent-admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.talent-admin-grid.full{grid-template-columns:1fr;}
+.photo-upload-area{border:1.5px dashed rgba(201,168,76,0.3);border-radius:8px;padding:14px;text-align:center;cursor:pointer;transition:.2s;position:relative;overflow:hidden;min-height:80px;display:flex;align-items:center;justify-content:center;}
+.photo-upload-area:hover{border-color:var(--gold);background:rgba(201,168,76,0.04);}
+.photo-upload-area input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.photo-preview-img{width:100%;max-height:140px;object-fit:cover;border-radius:6px;display:block;}
+.photo-placeholder{color:rgba(255,255,255,0.35);font-size:12px;}
+.upload-icon{font-size:24px;color:rgba(201,168,76,0.4);margin-bottom:6px;}
+.btn-add{display:flex;align-items:center;gap:6px;background:transparent;border:1px dashed rgba(201,168,76,0.4);color:var(--gold);padding:10px 16px;border-radius:8px;cursor:pointer;font-size:13px;width:100%;justify-content:center;margin-top:4px;transition:.2s;}
+.btn-add:hover{background:rgba(201,168,76,0.08);}
+.btn-save{width:100%;padding:14px;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#0a0a0f;font-size:15px;font-weight:800;border:none;border-radius:10px;cursor:pointer;letter-spacing:0.5px;margin-top:6px;transition:.2s;}
+.btn-save:hover{opacity:.9;}
+.toggle-row{display:flex;align-items:center;gap:12px;margin-top:8px;}
+.toggle-switch{position:relative;width:44px;height:24px;flex-shrink:0;}
+.toggle-switch input{opacity:0;width:0;height:0;}
+.toggle-slider{position:absolute;inset:0;background:#2a2a3a;border-radius:24px;cursor:pointer;transition:.3s;}
+.toggle-slider:before{content:'';position:absolute;width:18px;height:18px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.3s;}
+input:checked+.toggle-slider{background:var(--gold);}
+input:checked+.toggle-slider:before{transform:translateX(20px);}
+.toggle-label{font-size:13px;color:rgba(255,255,255,0.7);}
+.info-box{background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.2);border-radius:8px;padding:10px 14px;font-size:12px;color:rgba(255,255,255,0.5);margin-top:10px;line-height:1.6;}
+
+.toast{position:fixed;bottom:80px;right:24px;padding:12px 20px;border-radius:10px;font-size:13px;font-weight:600;z-index:9999;pointer-events:none;opacity:0;transition:opacity .3s;}
+.toast.show{opacity:1;}
+.toast.success{background:rgba(29,158,117,0.95);color:#fff;}
+.toast.error{background:rgba(226,75,74,0.95);color:#fff;}
+
+.chat-bubble{position:fixed;bottom:24px;right:24px;z-index:300;background:var(--gold);border:none;width:54px;height:54px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(201,168,76,0.4);transition:.2s;}
+.chat-bubble:hover{transform:scale(1.08);}
+.chat-bubble svg{width:26px;height:26px;fill:#0a0a0f;}
+.chat-notif{position:absolute;top:-2px;right:-2px;width:16px;height:16px;background:#e24b4a;border-radius:50%;font-size:9px;color:#fff;display:none;align-items:center;justify-content:center;font-weight:800;}
+.chat-win{position:fixed;bottom:88px;right:24px;width:320px;background:#13131a;border:1px solid rgba(201,168,76,0.2);border-radius:16px;overflow:hidden;display:none;flex-direction:column;z-index:300;box-shadow:0 20px 60px rgba(0,0,0,0.6);}
+.chat-win.open{display:flex;}
+.chat-head{background:linear-gradient(135deg,#1a1510,#2a2010);padding:14px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(201,168,76,0.1);}
+.chat-av{width:36px;height:36px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:16px;color:#0a0a0f;font-weight:800;flex-shrink:0;}
+.chat-head-info{flex:1;}
+.chat-head-name{font-size:13px;font-weight:700;color:#fff;}
+.chat-head-status{font-size:11px;color:#1d9e75;}
+.chat-close{background:transparent;border:none;color:rgba(255,255,255,0.4);cursor:pointer;font-size:20px;padding:0 4px;line-height:1;}
+.chat-close:hover{color:#fff;}
+.chat-msgs{flex:1;padding:14px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;max-height:280px;min-height:200px;}
+.msg-bubble{max-width:85%;padding:8px 12px;border-radius:12px;font-size:13px;line-height:1.5;}
+.msg-bubble.admin{background:var(--card2);color:#fff;align-self:flex-start;border-bottom-left-radius:4px;}
+.msg-bubble.user{background:rgba(201,168,76,0.2);color:#fff;align-self:flex-end;border-bottom-right-radius:4px;border:1px solid rgba(201,168,76,0.3);}
+.chat-input-row{display:flex;gap:8px;padding:10px 12px;border-top:1px solid rgba(255,255,255,0.06);}
+.chat-input-row input{flex:1;background:#0d0d15;border:1px solid rgba(255,255,255,0.1);color:#fff;padding:8px 10px;border-radius:8px;font-size:13px;outline:none;font-family:inherit;}
+.chat-input-row input:focus{border-color:rgba(201,168,76,0.5);}
+.chat-send{background:var(--gold);border:none;width:34px;height:34px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.chat-send svg{width:16px;height:16px;fill:#0a0a0f;}
+
+#bg-overlay{position:fixed;inset:0;z-index:-1;background-size:cover;background-position:center;transition:all .5s;}
+#yt-frame{position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;pointer-events:none;opacity:0;}
+</style>
+</head>
+<body>
+
+<div id="bg-overlay"></div>
+<div id="yt-frame"></div>
+
+<!-- NAV -->
+<nav class="nav">
+  <div style="display:flex;align-items:center;gap:10px;">
+    <div class="nav-logo">GELISAH</div>
+    <div class="nav-badge">VCS TALENT AGENCY</div>
+  </div>
+  <div class="nav-right">
+    <button class="btn-admin" onclick="showPage('admin')">⚙ Admin</button>
+  </div>
+</nav>
+
+<!-- HOME PAGE -->
+<div id="page-home" class="page active">
+  <div class="hero">
+    <div class="hero-title">OFFICIAL <span>GELISAH</span></div>
+    <div class="hero-divider"></div>
+    <div class="hero-subtitle">Jasa talent VCS terpercaya. Temukan talent terbaik untuk kebutuhan VCS yang siap melayanimu. Silakan pilih talent VCS kami dibawah ini.</div>
+  </div>
+  <div class="talent-grid" id="talent-grid"></div>
+</div>
+
+<!-- DETAIL PAGE -->
+<div id="page-detail" class="page">
+  <div class="detail-wrap">
+    <button class="back-btn" onclick="showPage('home')">← Kembali</button>
+    <div id="detail-content"></div>
+  </div>
+</div>
+
+<!-- ADMIN PAGE -->
+<div id="page-admin" class="page">
+  <div class="admin-wrap">
+    <div class="admin-title">PANEL ADMIN</div>
+    <div class="admin-sub">Kelola background, musik, talent, dan tampilan website</div>
+
+    <div class="section-card">
+      <div class="section-title">Background Website</div>
+      <div class="bg-row">
+        <div>
+          <label>Warna Solid</label>
+          <div class="color-row">
+            <input type="color" id="bg-color" value="#0a0a0f" oninput="onColorPick()">
+            <input type="text" id="bg-color-hex" value="#0a0a0f" oninput="syncColorHex()" placeholder="#0a0a0f">
+          </div>
+        </div>
+        <div>
+          <label>Upload Foto Background</label>
+          <div class="photo-upload-area" style="height:60px;">
+            <input type="file" accept="image/*" onchange="handleBgUpload(event)">
+            <div id="bg-upload-label" class="photo-placeholder">📁 Klik untuk upload foto</div>
+          </div>
+          <button onclick="clearBgImage()" style="background:transparent;border:none;color:rgba(255,255,255,0.4);font-size:11px;cursor:pointer;margin-top:6px;">✕ Hapus foto background</button>
+        </div>
+      </div>
+      <label>Preview Background</label>
+      <div class="bg-preview" id="bg-preview"></div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-title">Musik Latar Belakang</div>
+      <div style="margin-bottom:14px;">
+        <label>Link YouTube Musik</label>
+        <input type="url" id="music-url-input" placeholder="https://youtu.be/...">
+      </div>
+      <div class="toggle-row">
+        <label class="toggle-switch">
+          <input type="checkbox" id="music-enabled" checked>
+          <span class="toggle-slider"></span>
+        </label>
+        <span class="toggle-label">Aktifkan musik latar (volume 50%)</span>
+      </div>
+      <div class="info-box">
+        🎵 Musik akan otomatis berjalan di latar belakang saat pengunjung pertama kali berinteraksi dengan halaman (klik/tap). Tidak ada tombol play/pause untuk pengunjung.
+      </div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-title">Daftar Talent</div>
+      <div id="talent-list"></div>
+      <button class="btn-add" onclick="addTalent()">+ Tambah Talent</button>
+    </div>
+
+    <button class="btn-save" onclick="saveAll()">💾 Simpan Semua Perubahan</button>
+    <div style="margin-top:12px;text-align:center;">
+      <button onclick="showPage('home')" style="background:transparent;border:none;color:rgba(255,255,255,0.4);font-size:13px;cursor:pointer;">← Kembali ke halaman utama</button>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM LEFT BUTTONS -->
+<div class="bottom-left-btns">
+  <a href="https://t.me/gelisahidpub" target="_blank" class="fixed-btn">
+    <svg viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+    GROUP GELISAH
+  </a>
+  <a href="https://t.me/ttalengelisah" target="_blank" class="fixed-btn">
+    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
+    CHANNEL GELISAH
+  </a>
+</div>
+
+<!-- LIVE CHAT -->
+<div style="position:fixed;bottom:24px;right:24px;z-index:300;">
+  <div class="chat-notif" id="chat-notif">1</div>
+  <button class="chat-bubble" onclick="toggleChat()" title="Live Chat">
+    <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/></svg>
+  </button>
+</div>
+
+<div class="chat-win" id="chat-win">
+  <div class="chat-head">
+    <div class="chat-av">G</div>
+    <div class="chat-head-info">
+      <div class="chat-head-name">GELISAH Support</div>
+      <div class="chat-head-status">● Online</div>
+    </div>
+    <button class="chat-close" onclick="toggleChat()">✕</button>
+  </div>
+  <div class="chat-msgs" id="chat-msgs">
+    <div class="msg-bubble admin">Halo! Selamat datang di GELISAH VCS Talent Agency 👋</div>
+    <div class="msg-bubble admin">Silakan pilih talent favorit kamu atau tanya kami di sini. Kami siap membantu! ✨</div>
+  </div>
+  <div class="chat-input-row">
+    <input type="text" id="chat-input" placeholder="Ketik pesan..." onkeydown="if(event.key==='Enter')sendChat()">
+    <button class="chat-send" onclick="sendChat()">
+      <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+    </button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://www.youtube.com/iframe_api"></script>
+<script>
+const DB_KEY = 'gelisah_data_v4';
+
+let state = {
+  bg: { type: 'color', value: '#0a0a0f', imageData: null },
+  music: { enabled: true, url: 'https://youtu.be/S8m5FQfANs4?si=wgY8OOJu21TlGtiF' },
+  talents: [
+    { id: 1, name: 'Arlina', photo: '', desc: 'Talent VCS cantik dan ramah, siap menemanimu kapan saja dengan suara merdu dan kepribadian yang menyenangkan.' },
+    { id: 2, name: 'Bella', photo: '', desc: 'Percakapan seru dan menarik, Bella hadir untuk membuatmu nyaman dan terhibur setiap saat.' },
+    { id: 3, name: 'Citra', photo: '', desc: 'Energik dan ceria, Citra adalah pilihan terbaik untuk sesi VCS yang penuh keceriaan dan keseruan.' }
+  ]
+};
+let nextId = 100;
+let chatOpen = false;
+let replyIdx = 0;
+let ytPlayer = null;
+let ytApiReady = false;
+let musicStarted = false;
+
+const autoReplies = [
+  'Terima kasih sudah menghubungi kami! 😊',
+  'Silakan pilih talent dari halaman utama untuk order langsung ya.',
+  'Ada yang bisa kami bantu lagi?',
+  'Tim kami siap melayani 24/7. Untuk order cepat, klik tombol di profil talent! 💫',
+  'Terima kasih atas kepercayaan kamu kepada GELISAH! 🌟',
+  'Untuk info lebih lanjut bisa gabung di group Telegram kami ya! 😊'
+];
+
+/* ===== DATA ===== */
+function loadData() {
+  try {
+    const s = localStorage.getItem(DB_KEY);
+    if (s) {
+      const p = JSON.parse(s);
+      state = Object.assign({}, state, p);
+      if (!state.music) state.music = { enabled: true, url: 'https://youtu.be/S8m5FQfANs4?si=wgY8OOJu21TlGtiF' };
+      nextId = Math.max(nextId, ...state.talents.map(t => t.id || 0)) + 1;
+    }
+  } catch(e) {}
+}
+
+function saveData() {
+  try { localStorage.setItem(DB_KEY, JSON.stringify(state)); } catch(e) {}
+}
+
+/* ===== YOUTUBE MUSIC ===== */
+function extractYtId(url) {
+  if (!url) return null;
+  const m = url.match(/(?:youtu\.be\/|v=|embed\/)([A-Za-z0-9_-]{11})/);
+  return m ? m[1] : null;
+}
+
+function onYouTubeIframeAPIReady() {
+  ytApiReady = true;
+}
+
+function startMusic() {
+  if (musicStarted || !state.music || !state.music.enabled) return;
+  const vid = extractYtId(state.music.url);
+  if (!vid) return;
+
+  if (!ytApiReady) {
+    setTimeout(startMusic, 500);
+    return;
+  }
+
+  musicStarted = true;
+  const container = document.getElementById('yt-frame');
+  const el = document.createElement('div');
+  el.id = 'yt-inner';
+  container.appendChild(el);
+
+  ytPlayer = new YT.Player('yt-inner', {
+    videoId: vid,
+    playerVars: {
+      autoplay: 1,
+      loop: 1,
+      playlist: vid,
+      controls: 0,
+      disablekb: 1,
+      fs: 0,
+      modestbranding: 1,
+      rel: 0
+    },
+    events: {
+      onReady: function(e) {
+        e.target.setVolume(50);
+        e.target.playVideo();
+      },
+      onStateChange: function(e) {
+        // keep looping
+        if (e.data === YT.PlayerState.ENDED) {
+          ytPlayer.seekTo(0);
+          ytPlayer.playVideo();
+        }
+      }
+    }
+  });
+}
+
+function stopMusic() {
+  if (ytPlayer) {
+    try { ytPlayer.stopVideo(); ytPlayer.destroy(); } catch(e) {}
+    ytPlayer = null;
+  }
+  musicStarted = false;
+  const el = document.getElementById('yt-inner');
+  if (el) el.remove();
+}
+
+function onFirstInteraction() {
+  if (state.music && state.music.enabled && !musicStarted) {
+    startMusic();
+  }
+  document.removeEventListener('click', onFirstInteraction);
+  document.removeEventListener('touchstart', onFirstInteraction);
+  document.removeEventListener('keydown', onFirstInteraction);
+  document.removeEventListener('scroll', onFirstInteraction);
+}
+
+/* ===== BACKGROUND ===== */
+function applyBg() {
+  const o = document.getElementById('bg-overlay');
+  if (state.bg && state.bg.imageData) {
+    o.style.backgroundImage = 'url(' + state.bg.imageData + ')';
+    o.style.backgroundColor = '';
+  } else {
+    o.style.backgroundImage = '';
+    o.style.backgroundColor = (state.bg && state.bg.value) || '#0a0a0f';
+  }
+}
+
+function handleBgUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    state.bg.imageData = ev.target.result;
+    state.bg.type = 'image';
+    document.getElementById('bg-upload-label').textContent = '✓ ' + file.name;
+    previewBg();
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearBgImage() {
+  state.bg.imageData = null;
+  state.bg.type = 'color';
+  document.getElementById('bg-upload-label').textContent = '📁 Klik untuk upload foto';
+  previewBg();
+}
+
+function previewBg() {
+  const prev = document.getElementById('bg-preview');
+  if (state.bg.imageData) {
+    prev.style.backgroundImage = 'url(' + state.bg.imageData + ')';
+    prev.style.backgroundColor = '';
+  } else {
+    prev.style.backgroundColor = document.getElementById('bg-color').value;
+    prev.style.backgroundImage = '';
+  }
+}
+
+function onColorPick() {
+  const c = document.getElementById('bg-color').value;
+  document.getElementById('bg-color-hex').value = c;
+  state.bg.value = c;
+  state.bg.imageData = null;
+  previewBg();
+}
+
+function syncColorHex() {
+  const v = document.getElementById('bg-color-hex').value;
+  if (/^#[0-9a-f]{6}$/i.test(v)) {
+    document.getElementById('bg-color').value = v;
+    state.bg.value = v;
+    state.bg.imageData = null;
+    previewBg();
+  }
+}
+
+/* ===== TALENT ===== */
+function renderTalentGrid() {
+  const grid = document.getElementById('talent-grid');
+  grid.innerHTML = '';
+  if (!state.talents || !state.talents.length) {
+    grid.innerHTML = '<div style="text-align:center;color:rgba(255,255,255,0.3);padding:60px;grid-column:1/-1;">Belum ada talent. Tambahkan di panel admin.</div>';
+    return;
+  }
+  state.talents.forEach(t => {
+    const card = document.createElement('div');
+    card.className = 'talent-card';
+    card.onclick = () => showDetail(t);
+    const img = t.photo
+      ? '<img src="' + t.photo + '" alt="' + t.name + '" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'"><div class="talent-card-no-img" style="display:none;">👤</div>'
+      : '<div class="talent-card-no-img">👤</div>';
+    card.innerHTML = img +
+      '<div class="talent-info">' +
+        '<div class="talent-name">' + t.name + '</div>' +
+        '<div class="talent-desc">' + t.desc + '</div>' +
+        '<div class="talent-cta">Lihat profil →</div>' +
+      '</div>';
+    grid.appendChild(card);
+  });
+}
+
+function showDetail(t) {
+  const msg = encodeURIComponent('Halo admin GELISAH, saya ingin order VCS dengan talent: ' + t.name);
+  const img = t.photo
+    ? '<img src="' + t.photo + '" alt="' + t.name + '" class="detail-photo" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'"><div class="detail-photo-placeholder" style="display:none;">👤</div>'
+    : '<div class="detail-photo-placeholder">👤</div>';
+  document.getElementById('detail-content').innerHTML =
+    img +
+    '<div class="detail-name">' + t.name + '</div>' +
+    '<div class="detail-badge">VCS TALENT GELISAH</div>' +
+    '<div class="detail-desc">' + t.desc + '</div>' +
+    '<a href="https://t.me/livechatgs_bot?text=' + msg + '" target="_blank" class="order-btn">💬 Order VCS dengan ' + t.name + '</a>';
+  showPage('detail');
+}
+
+/* ===== ADMIN ===== */
+function renderAdminList() {
+  const list = document.getElementById('talent-list');
+  list.innerHTML = '';
+  (state.talents || []).forEach((t, i) => {
+    const div = document.createElement('div');
+    div.className = 'talent-admin-item';
+    const up = i > 0 ? '<button class="btn-sm" onclick="moveTalent(' + t.id + ',-1)">↑</button>' : '';
+    const dn = i < state.talents.length - 1 ? '<button class="btn-sm" onclick="moveTalent(' + t.id + ',1)">↓</button>' : '';
+    const imgSec = t.photo
+      ? '<div class="photo-upload-area" style="flex-direction:column;"><input type="file" accept="image/*" onchange="handleTalentPhoto(event,' + t.id + ')"><img src="' + t.photo + '" class="photo-preview-img"></div><button onclick="clearTalentPhoto(' + t.id + ')" style="background:transparent;border:none;color:rgba(255,255,255,0.4);font-size:11px;cursor:pointer;margin-top:4px;">✕ Hapus foto</button>'
+      : '<div class="photo-upload-area"><input type="file" accept="image/*" onchange="handleTalentPhoto(event,' + t.id + ')"><div><div class="upload-icon">📷</div><div class="photo-placeholder">Klik upload foto dari galeri</div></div></div>';
+    div.innerHTML =
+      '<div class="talent-admin-header">' +
+        '<span class="talent-num">TALENT #' + (i+1) + '</span>' +
+        '<div class="talent-admin-actions">' + up + dn + '<button class="btn-sm del" onclick="delTalent(' + t.id + ')">Hapus</button></div>' +
+      '</div>' +
+      '<div class="talent-admin-grid">' +
+        '<div><label>Nama Talent</label><input type="text" value="' + t.name + '" oninput="updateTalent(' + t.id + ',\'name\',this.value)" placeholder="Nama talent..."></div>' +
+        '<div><label>Foto Talent</label>' + imgSec + '</div>' +
+      '</div>' +
+      '<div class="talent-admin-grid full" style="margin-top:10px;">' +
+        '<div><label>Deskripsi</label><textarea oninput="updateTalent(' + t.id + ',\'desc\',this.value)">' + t.desc + '</textarea></div>' +
+      '</div>';
+    list.appendChild(div);
+  });
+}
+
+function handleTalentPhoto(e, id) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const r = new FileReader();
+  r.onload = ev => { updateTalent(id, 'photo', ev.target.result); renderAdminList(); };
+  r.readAsDataURL(file);
+}
+
+function clearTalentPhoto(id) { updateTalent(id, 'photo', ''); renderAdminList(); }
+function addTalent() { state.talents.push({ id: nextId++, name: 'Talent Baru', photo: '', desc: 'Deskripsi talent...' }); renderAdminList(); }
+function delTalent(id) { if (!confirm('Hapus talent ini?')) return; state.talents = state.talents.filter(t => t.id !== id); renderAdminList(); }
+function updateTalent(id, key, val) { const t = state.talents.find(t => t.id === id); if (t) t[key] = val; }
+
+function moveTalent(id, dir) {
+  const i = state.talents.findIndex(t => t.id === id);
+  const ni = i + dir;
+  if (ni < 0 || ni >= state.talents.length) return;
+  [state.talents[i], state.talents[ni]] = [state.talents[ni], state.talents[i]];
+  renderAdminList();
+}
+
+function saveAll() {
+  state.bg.value = document.getElementById('bg-color').value;
+  const newUrl = document.getElementById('music-url-input').value.trim();
+  const newEnabled = document.getElementById('music-enabled').checked;
+
+  // if url changed, reset player so it restarts with new track
+  if (newUrl && newUrl !== state.music.url) {
+    stopMusic();
+    state.music.url = newUrl;
+    musicStarted = false;
+    if (newEnabled) startMusic();
+  } else if (!newEnabled && state.music.enabled) {
+    stopMusic();
+  } else if (newEnabled && !state.music.enabled) {
+    musicStarted = false;
+    startMusic();
+  }
+  state.music.url = newUrl || state.music.url;
+  state.music.enabled = newEnabled;
+
+  saveData();
+  applyBg();
+  renderTalentGrid();
+  showToast('Semua perubahan berhasil disimpan! ✓', 'success');
+}
+
+function showToast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + type + ' show';
+  setTimeout(() => { t.className = 'toast'; }, 3000);
+}
+
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  if (id === 'admin') {
+    renderAdminList();
+    previewBg();
+    const col = state.bg.value || '#0a0a0f';
+    document.getElementById('bg-color').value = col;
+    document.getElementById('bg-color-hex').value = col;
+    document.getElementById('music-url-input').value = state.music.url || '';
+    document.getElementById('music-enabled').checked = !!state.music.enabled;
+  }
+  window.scrollTo(0, 0);
+}
+
+/* ===== CHAT ===== */
+function toggleChat() {
+  chatOpen = !chatOpen;
+  document.getElementById('chat-win').classList.toggle('open', chatOpen);
+  if (chatOpen) {
+    document.getElementById('chat-notif').style.display = 'none';
+    document.getElementById('chat-input').focus();
+  }
+}
+
+function sendChat() {
+  const inp = document.getElementById('chat-input');
+  const msg = inp.value.trim();
+  if (!msg) return;
+  const msgs = document.getElementById('chat-msgs');
+  const u = document.createElement('div');
+  u.className = 'msg-bubble user';
+  u.textContent = msg;
+  msgs.appendChild(u);
+  inp.value = '';
+  msgs.scrollTop = msgs.scrollHeight;
+  setTimeout(() => {
+    const a = document.createElement('div');
+    a.className = 'msg-bubble admin';
+    a.textContent = autoReplies[replyIdx++ % autoReplies.length];
+    msgs.appendChild(a);
+    msgs.scrollTop = msgs.scrollHeight;
+  }, 900);
+}
+
+/* ===== INIT ===== */
+loadData();
+applyBg();
+renderTalentGrid();
+
+// Chat notif
+setTimeout(() => { if (!chatOpen) document.getElementById('chat-notif').style.display = 'flex'; }, 3000);
+
+// Music: start on first user interaction (browser policy)
+document.addEventListener('click', onFirstInteraction, { once: false });
+document.addEventListener('touchstart', onFirstInteraction, { once: false });
+document.addEventListener('keydown', onFirstInteraction, { once: false });
+document.addEventListener('scroll', onFirstInteraction, { once: false });
+</script>
+</body>
+</html>
